@@ -1,0 +1,9 @@
+[package]
+name = "ntk-enclave"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tun = { workspace = true }
+nix = { workspace = true }
+ntk-common = { path = "../common" }
