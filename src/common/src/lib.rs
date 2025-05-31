@@ -2,9 +2,9 @@ use std::{os::fd::{AsRawFd, RawFd}, thread};
 use nix::sys::socket::{recv, send, MsgFlags};
 use tun::Device;
 
-pub const ENCLAVE_IP: &str = "";
-pub const HOST_IP: &str = "";
-pub const TUN_NETMASK: &str = "";
+pub const ENCLAVE_IP: &str = "10.0.0.2";
+pub const HOST_IP: &str = "10.0.0.1";
+pub const TUN_NETMASK: &str = "255.255.255.0";
 pub const ENCLAVE_CID: u32 = 10;
 pub const HOST_PORT: u32 = 9000;
 
