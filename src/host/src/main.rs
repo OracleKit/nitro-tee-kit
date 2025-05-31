@@ -1,6 +1,6 @@
 use std::os::fd::{AsRawFd, OwnedFd};
 
-use nix::{libc::VMADDR_CID_ANY, sys::socket::{bind, listen, socket, AddressFamily, Backlog, SockFlag, SockType, VsockAddr}};
+use nix::{libc::VMADDR_CID_ANY, sys::socket::{accept, bind, listen, socket, AddressFamily, Backlog, SockFlag, SockType, VsockAddr}};
 use ntk_common::{relay, ENCLAVE_IP, HOST_IP, HOST_PORT, TUN_NETMASK};
 use tun::{Configuration, Device, AbstractDevice};
 
@@ -16,7 +16,7 @@ fn create_tun_device() -> Device {
     tun_dev
 }
 
-fn accept_vsock() -> Result<OwnedFd, ()> {
+fn listen_vsock() -> Result<OwnedFd, ()> {
     let socket = socket(
         AddressFamily::Vsock,
         SockType::Stream,
@@ -36,8 +36,9 @@ fn main() {
     let tun_dev = create_tun_device();
     println!("TUN device {} connected.", tun_dev.tun_name().unwrap());
 
-    let vsock = accept_vsock().unwrap();
+    let listener = listen_vsock().unwrap();
+    let vsock = accept(listener.as_raw_fd()).unwrap();
     println!("Vsock connected.");
 
-    relay(vsock.as_raw_fd(), &tun_dev);
+    relay(vsock, &tun_dev);
 }
