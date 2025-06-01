@@ -1,7 +1,8 @@
-FROM alpine:latest
+FROM ubuntu:latest
 
-RUN apk update && apk add net-tools curl
-COPY enclave.sh .
-COPY ntk-enclave .
+RUN apt-get update && apt-get add net-tools curl -y
+COPY enclave.sh /home/root
+COPY ntk-enclave /home/root
+RUN chmod +x /home/root/ntk-enclave
 
-CMD ["./enclave.sh"]
+CMD ["/bin/sh", "/home/root/enclave.sh"]

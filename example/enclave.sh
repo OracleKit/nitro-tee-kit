@@ -1,6 +1,6 @@
 #!/bin/bash
 
-./ntk-enclave &
+/home/root/ntk-enclave &
 
 sleep 5
 

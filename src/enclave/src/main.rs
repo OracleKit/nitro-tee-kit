@@ -1,6 +1,6 @@
-use std::os::fd::{AsRawFd, OwnedFd, RawFd};
-use nix::sys::socket::{connect, socket, AddressFamily, MsgFlags, SockFlag, SockType, VsockAddr};
-use ntk_common::{relay, ENCLAVE_CID, ENCLAVE_IP, HOST_IP, HOST_PORT, TUN_NETMASK};
+use std::os::fd::{AsRawFd, OwnedFd};
+use nix::sys::socket::{connect, socket, AddressFamily, SockFlag, SockType, VsockAddr};
+use ntk_common::{relay, ENCLAVE_IP, HOST_CID, HOST_IP, HOST_PORT, TUN_NETMASK};
 use tun::{AbstractDevice, Configuration, Device};
 
 fn create_tun_device() -> Device {
@@ -16,7 +16,7 @@ fn create_tun_device() -> Device {
 }
 
 fn vsock_connect() -> Result<OwnedFd, ()> {
-    let sockaddr = VsockAddr::new(ENCLAVE_CID, HOST_PORT);
+    let sockaddr = VsockAddr::new(HOST_CID, HOST_PORT);
     let socket = socket(
         AddressFamily::Vsock,
         SockType::Stream,
