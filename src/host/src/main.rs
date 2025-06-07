@@ -38,8 +38,12 @@ fn main() {
     println!("TUN device {} connected.", tun_dev.tun_name().unwrap());
 
     let listener = listen_vsock().unwrap();
-    let vsock = accept(listener.as_raw_fd()).unwrap();
-    println!("Vsock connected.");
+    
+    loop {
+        let tun_dev = tun_dev.clone();
+        let vsock = accept(listener.as_raw_fd()).unwrap();
+        println!("Vsock connected.");
 
-    relay(vsock, tun_dev);
+        relay(vsock, tun_dev);
+    }
 }
