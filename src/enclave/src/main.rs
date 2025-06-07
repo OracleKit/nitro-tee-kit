@@ -1,4 +1,4 @@
-use std::os::fd::{AsRawFd, OwnedFd};
+use std::{os::fd::{AsRawFd, OwnedFd}, sync::Arc};
 use nix::sys::socket::{connect, socket, AddressFamily, SockFlag, SockType, VsockAddr};
 use ntk_common::{relay, ENCLAVE_IP, HOST_CID, HOST_IP, HOST_PORT, TUN_NETMASK};
 use tun::{AbstractDevice, Configuration, Device};
@@ -32,10 +32,11 @@ fn vsock_connect() -> Result<OwnedFd, ()> {
 
 fn main() {
     let tun_dev = create_tun_device();
+    let tun_dev = Arc::new(tun_dev);
     println!("TUN device {} connected.", tun_dev.tun_name().unwrap());
 
     let vsock = vsock_connect().unwrap();
     println!("Vsock connected.");
 
-    relay(vsock.as_raw_fd(), &tun_dev);
+    relay(vsock.as_raw_fd(), tun_dev);
 }
