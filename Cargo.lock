@@ -331,6 +331,19 @@ dependencies = [
 
 [[package]]
 name = "nix"
+version = "0.29.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "71e2746dc3a24dd78b3cfcb7be93368c6de9963d30f43a6a73998a9cf4b17b46"
+dependencies = [
+ "bitflags",
+ "cfg-if",
+ "cfg_aliases",
+ "libc",
+ "memoffset",
+]
+
+[[package]]
+name = "nix"
 version = "0.30.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "74523f3a35e05aba87a1d978330aef40f67b0304ac79c1c00b294c9830543db6"
@@ -346,15 +359,16 @@ dependencies = [
 name = "ntk-common"
 version = "0.1.0"
 dependencies = [
- "nix",
+ "nix 0.30.1",
  "tun",
+ "vsock",
 ]
 
 [[package]]
 name = "ntk-enclave"
 version = "0.1.0"
 dependencies = [
- "nix",
+ "nix 0.30.1",
  "ntk-common",
  "tun",
 ]
@@ -363,7 +377,7 @@ dependencies = [
 name = "ntk-host"
 version = "0.1.0"
 dependencies = [
- "nix",
+ "nix 0.30.1",
  "ntk-common",
  "tun",
 ]
@@ -544,7 +558,7 @@ dependencies = [
  "ipnet",
  "libc",
  "log",
- "nix",
+ "nix 0.30.1",
  "thiserror",
  "tokio",
  "tokio-util",
@@ -557,6 +571,16 @@ name = "unicode-ident"
 version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5a5f39404a5da50712a4c1eecf25e90dd62b613502b7e925fd4e4d19b5c96512"
+
+[[package]]
+name = "vsock"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4e8b4d00e672f147fc86a09738fadb1445bd1c0a40542378dfb82909deeee688"
+dependencies = [
+ "libc",
+ "nix 0.29.0",
+]
 
 [[package]]
 name = "wasi"
