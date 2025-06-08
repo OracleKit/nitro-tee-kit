@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 nix = { workspace = true }
 tun = { workspace = true }
+vsock = { workspace = true }

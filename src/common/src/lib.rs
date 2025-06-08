@@ -1,6 +1,10 @@
-use std::{io::ErrorKind, os::fd::RawFd, sync::Arc, thread};
-use nix::{sys::socket::{recv, send, MsgFlags}};
-use tun::Device;
+use std::{io::{ErrorKind, Read, Write}, os::fd::AsFd};
+use nix::{errno::Errno, poll::{poll, PollFd, PollFlags, PollTimeout}};
+use crate::tun::Device;
+use ::vsock::VsockStream;
+
+pub mod vsock;
+pub mod tun;
 
 pub const ENCLAVE_IP: &str = "10.0.0.2";
 pub const HOST_IP: &str = "10.0.0.1";
@@ -9,92 +13,66 @@ pub const ENCLAVE_CID: u32 = 10;
 pub const HOST_CID: u32 = 3;
 pub const HOST_PORT: u32 = 5005;
 
-fn forward_packets_vsock_to_tun(vsock: &RawFd, tun: &Device) {
+fn forward<S: Read, D: Write>(src: &mut S, dest: &mut D) -> bool {
     let mut buf = [0u8; 1504];
-    let vsock = vsock.clone();
 
     loop {
-        let read_bytes = match recv(vsock, &mut buf, MsgFlags::empty()) {
-            Ok(b) => b,
-            Err(nix::errno::Errno::EINTR) => continue,
+        match src.read(&mut buf) {
+            Ok(_) => break,
+            Err(e) => match e.kind() {
+                ErrorKind::Interrupted => continue,
+                _ => return true
+            }
+        }
+    };
+
+    match dest.write_all(&mut buf) {
+        Ok(()) => (),
+        Err(_) => return true
+    };
+
+    return false;
+}
+
+fn poll_and_ignore_interrupts(fds: &mut [PollFd], timeout: PollTimeout) -> Result<i32, Errno> {
+    loop {
+        let result = poll(fds, timeout);
+        match result {
+            Err(Errno::EINTR) => continue,
+            _ => return result
+        }
+    }
+}
+
+pub fn relay(vsock: &mut VsockStream, tun_dev: &mut Device) {
+    loop {
+        let mut pollfds = [
+            PollFd::new(vsock.as_fd(), PollFlags::POLLIN),
+            PollFd::new(tun_dev.as_fd(), PollFlags::POLLIN),
+
+        ];
+
+        match poll_and_ignore_interrupts(&mut pollfds, PollTimeout::NONE) {
+            Ok(_) => (),
             Err(e) => {
-                println!("Error while reading from vsock: {:?}", e);
+                println!("Error encountered while polling: {}", e);
                 return;
             }
         };
 
-        // possible connection dead. TODO: retry connecting?
-        if read_bytes == 0 { continue; }
+        let is_vsock_ready = pollfds[0].any().unwrap_or_default();
+        let is_tun_ready = pollfds[1].any().unwrap_or_default();
 
-        let mut sent_bytes = 0;
-        while sent_bytes < read_bytes {
-            sent_bytes += match tun.send(&buf[sent_bytes..read_bytes]) {
-                Ok(b) => b,
-                Err(e) => match e.kind() {
-                    ErrorKind::Interrupted => 0,
-                    _ => {
-                        println!("Error while writing to TUN: {:?}", e);
-                        return;
-                    }
-                }
-            };
+        let mut disconnect = false;
+        if is_vsock_ready {
+            disconnect = forward(vsock, tun_dev.inner_mut());
+        } else if is_tun_ready {
+            disconnect = forward(tun_dev.inner_mut(), vsock);
         }
-    }
-}
 
-fn forward_packets_tun_to_vsock(vsock: &RawFd, tun: &Device) {
-    let mut buf = [0u8; 1504];
-    let vsock = vsock.clone();
-
-    loop {
-        let read_bytes = match tun.recv(&mut buf) {
-            Ok(b) => b,
-            Err(e) => match e.kind() {
-                ErrorKind::Interrupted => 0,
-                _ => {
-                    println!("Error while writing to TUN: {:?}", e);
-                    return;
-                }
-            }
-        };
-
-        // possible connection dead. TODO: retry connecting?
-        if read_bytes == 0 { continue; }
-
-        let mut sent_bytes = 0;
-        while sent_bytes < read_bytes {
-            sent_bytes += match send(vsock, &buf[sent_bytes..read_bytes], MsgFlags::empty()) {
-                Ok(b) => b,
-                Err(nix::errno::Errno::EINTR) => continue,
-                Err(e) => {
-                    println!("Error while writing to vsock: {:?}", e);
-                    return;
-                }
-            };
+        // TODO: If TUN device disconnects or errors, more handling
+        if disconnect {
+            return;
         }
-    }
-}
-
-pub fn relay(vsock: RawFd, tun_dev: Arc<Device>) {
-    let mut handles = vec!{};
-
-    {
-        let tun_dev = tun_dev.clone();
-        let handle = thread::spawn(move || {
-            forward_packets_vsock_to_tun(&vsock, &tun_dev);
-        });
-        handles.push(handle);
-    }
-
-    {
-        let tun_dev = tun_dev.clone();
-        let handle = thread::spawn(move || {
-            forward_packets_tun_to_vsock(&vsock, &tun_dev);
-        });
-        handles.push(handle);
-    }
-
-    for handle in handles.into_iter() {
-        handle.join().unwrap();
     }
 }
