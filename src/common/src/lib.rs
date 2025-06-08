@@ -70,6 +70,7 @@ pub fn relay(vsock: &mut VsockStream, tun_dev: &mut Device) {
             disconnect = forward(tun_dev.inner_mut(), vsock);
         }
 
+        // TODO: If TUN device disconnects or errors, more handling
         if disconnect {
             return;
         }
