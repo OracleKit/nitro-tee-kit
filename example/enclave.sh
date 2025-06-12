@@ -1,6 +1,7 @@
 #!/bin/bash
 
-sleep 5
+ntk-up
+echo "STARTED"
 
 ps aux
 

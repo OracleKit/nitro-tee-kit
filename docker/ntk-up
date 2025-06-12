@@ -1,0 +1,42 @@
+#!/bin/bash
+
+LOG_FILE=/var/log/ntk-enclave.log
+
+function start_daemon_loop {
+    rm -rf $LOG_FILE 2>/dev/null
+    touch $LOG_FILE
+
+    echo "Starting daemon loop..." >>$LOG_FILE
+
+    while true; do
+        ntk-enclave >>$LOG_FILE 2>&1
+
+        echo "Daemon failed. Restarting..." >> $LOG_FILE
+        sleep .5
+    done;
+}
+
+function wait_for_daemon_to_start {
+    while ! grep "TUN device" $LOG_FILE >/dev/null 2>&1; do
+        sleep .5
+    done
+}
+
+function main {
+    nohup $0 daemon &
+    wait_for_daemon_to_start
+}
+
+command=$1
+if [ "$#" -eq 0 ]; then
+    command="main"
+fi
+
+if [[ "$command" == "start" ]]; then
+    main
+elif [[ "$command" == "daemon" ]]; then
+    start_daemon_loop
+else
+    echo "Invalid usage"
+    exit -1
+fi
