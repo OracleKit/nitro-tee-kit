@@ -32,7 +32,7 @@ if [ "$#" -eq 0 ]; then
     command="main"
 fi
 
-if [[ "$command" == "start" ]]; then
+if [[ "$command" == "main" ]]; then
     main
 elif [[ "$command" == "daemon" ]]; then
     start_daemon_loop
