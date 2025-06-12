@@ -24,7 +24,7 @@ function wait_for_daemon_to_start {
 }
 
 function main {
-    nohup $0 daemon > $LOG_NOHUP_FILE &
+    nohup $0 daemon >$LOG_NOHUP_FILE 2>&1 &
     wait_for_daemon_to_start
 }
 
