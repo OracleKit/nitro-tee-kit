@@ -5,6 +5,7 @@ use ::vsock::VsockStream;
 
 pub mod vsock;
 pub mod tun;
+pub mod ip;
 
 pub const ENCLAVE_IP: &str = "10.0.0.2";
 pub const HOST_IP: &str = "10.0.0.1";
