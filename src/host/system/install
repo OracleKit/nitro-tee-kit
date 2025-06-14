@@ -7,4 +7,9 @@ mv $DIRNAME/ntk-host.service /etc/systemd/system
 mv $DIRNAME/ntk-host /usr/bin/
 chmod +x /usr/bin/ntk-host
 
+mkdir -p /var/log/ntk
+rm -f /var/log/ntk/*
+touch /var/log/ntk/output.log
+touch /var/log/ntk/error.log
+
 systemctl enable --now --system ntk-host.service
