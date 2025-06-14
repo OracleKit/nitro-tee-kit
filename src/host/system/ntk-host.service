@@ -1,0 +1,14 @@
+[Unit]
+Description=NTK Host Daemon
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/ntk-host
+Restart=always
+RestartSec=1
+
+StandardOutput=append:/var/log/ntk/output.log
+StandardError=append:/var/log/ntk/error.log
+
+[Install]
+WantedBy=multi-user.target
