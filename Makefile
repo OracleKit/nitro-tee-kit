@@ -1,5 +1,5 @@
 .PHONY: build
-build: bin build/enclave-image
+build: bin build/enclave-image build/install build/ntk-host.service
 	@echo "Build successful!"
 
 build/enclave-image: build/ntk-enclave $(wildcard src/enclave/docker/*)
@@ -26,6 +26,13 @@ build/ntk-enclave: $(wildcard src/enclave/src/*) src/enclave/Cargo.toml build/li
 build/libntk_common.rlib: $(wildcard src/common/src/*) src/common/Cargo.toml | build-dirs
 	cargo build --package ntk-common
 	cp target/debug/libntk_common.rlib build/
+
+build/install: src/host/system/install | build-dirs
+	cp src/host/system/install build/install
+	chmod +x build/install
+
+build/ntk-host.service: src/host/system/ntk-host.service | build-dirs
+	cp src/host/system/ntk-host.service build/ntk-host.service
 
 build-dirs:
 	@mkdir -p build
