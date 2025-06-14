@@ -10,7 +10,7 @@ build/enclave-image: build/ntk-enclave $(wildcard src/enclave/docker/*)
 	docker build -t ntk-ubuntu build/tmp
 	docker image prune -f
 	rm -rf build/tmp
-	@touch build/enclave-image
+	docker images --digests | grep -m 1 "ntk-ubuntu" | awk '{ print $$3 }' > build/enclave-image
 
 .PHONY: bin
 bin: build/ntk-host build/ntk-enclave
