@@ -27,6 +27,4 @@ fn main() -> Result<(), String> {
         println!("Sleeping 5 secs before retrying.");
         thread::sleep(time::Duration::from_secs(5));
     }
-
-    Ok(())
 }
