@@ -21,16 +21,16 @@ build/enclave-image: build/ntk-enclave $(wildcard src/enclave/docker/*)
 bin: build/ntk-host build/ntk-enclave
 
 build/ntk-host: $(wildcard src/host/src/*) src/host/Cargo.toml build/libntk_common.rlib | build-dirs
-	cargo build --package ntk-host
-	cp target/debug/ntk-host build/
+	cargo build --package ntk-host --target aarch64-unknown-linux-musl
+	cp target/aarch64-unknown-linux-musl/debug/ntk-host build/
 
 build/ntk-enclave: $(wildcard src/enclave/src/*) src/enclave/Cargo.toml build/libntk_common.rlib | build-dirs
-	cargo build --package ntk-enclave
-	cp target/debug/ntk-enclave build/
+	cargo build --package ntk-enclave --target aarch64-unknown-linux-musl
+	cp target/aarch64-unknown-linux-musl/debug/ntk-enclave build/
 
 build/libntk_common.rlib: $(wildcard src/common/src/*) src/common/Cargo.toml | build-dirs
-	cargo build --package ntk-common
-	cp target/debug/libntk_common.rlib build/
+	cargo build --package ntk-common --target aarch64-unknown-linux-musl
+	cp target/aarch64-unknown-linux-musl/debug/libntk_common.rlib build/
 
 build/install: src/host/system/install | build-dirs
 	cp src/host/system/install build/install
