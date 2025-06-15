@@ -8,7 +8,7 @@ RELEASE_GZIP_NAME=release.tar.gz
 TMPDIR=$(mktemp -d)
 cd $TMPDIR
 
-curl -o $RELEASE_GZIP_NAME $RELEASE_GZIP_URL
+curl -LO $RELEASE_GZIP_URL
 tar -xvf $RELEASE_GZIP_NAME
 ./build/install
 
