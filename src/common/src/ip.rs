@@ -20,6 +20,10 @@ pub fn add_default_gateway(dev_name: &str, gateway_ip: &str) {
     run_command(&format!("ip route add default dev {} via {}", dev_name, gateway_ip))
         .map_err(|e| { format!("ip route add failed with exit status: {}", e) })
         .unwrap();
+
+    run_command(r#"rm -f /etc/resolv.conf && echo -e "nameserver 1.1.1.1\nnameserver 1.0.0.1" > /etc/resolv.conf"#)
+        .map_err(|e| { format!("dns nameserver config with exit status: {}", e) })
+        .unwrap();
 }
 
 pub fn add_forwarding_rules(dev_name: &str, subnet: &str) {
