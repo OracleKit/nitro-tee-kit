@@ -10,6 +10,7 @@ pub mod ip;
 pub const ENCLAVE_IP: &str = "10.0.0.2";
 pub const HOST_IP: &str = "10.0.0.1";
 pub const TUN_NETMASK: &str = "255.255.255.0";
+pub const SUBNET: &str = "10.0.0.0/24";
 pub const ENCLAVE_CID: u32 = 10;
 pub const HOST_CID: u32 = 3;
 pub const HOST_PORT: u32 = 5005;
