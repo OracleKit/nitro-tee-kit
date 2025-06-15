@@ -37,6 +37,8 @@ jobs:
         run: |
           docker tag ntk-ubuntu oraclekitio/ntk-ubuntu:${{ github.event.inputs.release_tag }}
           docker push oraclekitio/ntk-ubuntu:${{ github.event.inputs.release_tag }}
+          docker tag ntk-ubuntu oraclekitio/ntk-ubuntu:latest
+          docker push oraclekitio/ntk-ubuntu:latest
 
       - name: Create GitHub Release
         id: create_release
