@@ -2,6 +2,11 @@
 build: bin build/enclave-image build/install build/ntk-host.service
 	@echo "Build successful!"
 
+.PHONY: release
+release: bin build/install build/ntk-host.service
+	rm -f build/release.tar.gz
+	tar -c -z -f build/release.tar.gz build/install build/ntk-host.service build/ntk-host
+
 build/enclave-image: build/ntk-enclave $(wildcard src/enclave/docker/*)
 	rm -rf build/tmp
 	mkdir build/tmp
