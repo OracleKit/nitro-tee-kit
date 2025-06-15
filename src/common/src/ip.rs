@@ -28,14 +28,14 @@ pub fn add_forwarding_rules(dev_name: &str, subnet: &str) {
         .unwrap();
 
     let _ = run_command("nft add table ip nat");
-    let _ = run_command("nft add chain ip nat POSTROUTING { type nat hook postrouting priority 100 ; }");
+    let _ = run_command("nft add chain ip nat POSTROUTING { type nat hook postrouting priority 100 \\; }");
 
     run_command(&format!("nft add rule ip nat POSTROUTING ip saddr {} masquerade", subnet))
         .map_err(|e| { format!("adding nat masquerade rule failed with exit status: {}", e) })
         .unwrap();
 
     let _ = run_command("nft add table ip filter");
-    let _ = run_command("nft add chain ip filter FORWARD { type filter hook forward priority 0 ; policy drop ; }");
+    let _ = run_command("nft add chain ip filter FORWARD { type filter hook forward priority 0 \\; policy drop \\; }");
 
     run_command(&format!("nft add rule ip filter FORWARD iifname \"{}\" accept", dev_name))
         .map_err(|e| { format!("adding forward rule from tun failed with exit status: {}", e) })
