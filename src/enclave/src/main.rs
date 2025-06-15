@@ -1,10 +1,13 @@
 use std::{thread, time};
-use ntk_common::{relay, tun::{create_tun_device, DeviceType}, vsock::vsock_connect, HOST_PORT};
+use ntk_common::{ip::add_default_gateway, relay, tun::{create_tun_device, DeviceType}, vsock::vsock_connect, HOST_IP, HOST_PORT};
 use tun::AbstractDevice;
 
 fn main() -> Result<(), String> {
     let mut tun_dev = create_tun_device(DeviceType::Enclave)?;
-    println!("TUN device {} connected.", tun_dev.tun_name().unwrap());
+    let tun_dev_name = tun_dev.tun_name().unwrap();
+    println!("TUN device {} connected.", tun_dev_name);
+
+    add_default_gateway(tun_dev_name.as_str(), HOST_IP);
 
     loop {
         let connect_result = vsock_connect(HOST_PORT);

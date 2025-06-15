@@ -1,6 +1,6 @@
 FROM ubuntu:latest
 
-RUN apt-get update && apt-get install net-tools -y
+RUN apt-get update && apt-get install net-tools iproute2 -y
 
 COPY ./ntk-enclave /usr/bin
 COPY ./ntk-up /usr/bin
