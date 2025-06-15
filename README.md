@@ -1,7 +1,7 @@
 # Nitro TEE Kit
-Nitro TEE Kit (NTK) is a runtime environment tooling for Nitro Enclaves that provides features like network egress, ingress, host file system mounts, and many more...
+Nitro TEE Kit (NTK) is a runtime environment toolkit for Nitro Enclaves that provides features like network egress, ingress, host file system mounts, and many more...
 
-## Features
+## Current Features
 
 - Network egress to Host Machine and Internet
 
